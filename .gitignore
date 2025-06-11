@@ -1,0 +1,23 @@
+# Dependencias y artefactos de compilación
+node_modules
+dist
+.pnpm-store
+
+# Archivos de entorno (¡muy importante!)
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos del editor
+.vscode/
+.idea/
