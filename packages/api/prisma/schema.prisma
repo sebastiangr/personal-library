@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- DB MODELS ---
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password_hash String
+  name          String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  books         Book[] // A user can have multiple books
+}
+
+model Book {
+  id            String    @id @default(uuid())
+  title         String
+  subtitle      String?
+  isbn_13       String?   @unique
+  isbn_10       String?   @unique
+  page_count    Int?
+  cover_image_url String?
+  published_year Int?
+  description   String?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // A book belongs to a user
+  // This is a many-to-one relationship, meaning multiple books can belong to one user
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String
+}

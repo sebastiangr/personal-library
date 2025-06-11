@@ -1,0 +1,16 @@
+// packages/api/tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2020",         // Compila a una versión moderna de JS
+    "module": "CommonJS",        // Sistema de módulos para Node.js
+    "rootDir": "./src",          // Carpeta con nuestro código fuente TS
+    "outDir": "./dist",          // Carpeta donde irá el código JS compilado
+    "esModuleInterop": true,     // Mejora la compatibilidad con módulos CommonJS
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,              // Habilita todas las comprobaciones estrictas de tipos
+    "skipLibCheck": true,        // Evita comprobar tipos en librerías de terceros
+    "sourceMap": true            // Genera source maps para facilitar el debug
+  },
+  "include": ["src/**/*"],       // Qué archivos debe incluir TypeScript
+  "exclude": ["node_modules"]  // Qué carpetas ignorar
+}
