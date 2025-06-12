@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
+import bookRoutes from './routes/book.routes'; // Import book routes
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -24,6 +26,8 @@ app.get('/', (req: Request, res: Response) => {
     <p>Go to <a href="/api">/api</a> to test the API.</p>
   `);
 });
+
+app.use('/api/books', bookRoutes); // Use book routes under /api/books
 
 app.listen(PORT, () => {
   console.log(`🚀  Server running on http://localhost:${PORT}`);
