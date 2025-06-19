@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as bookService from '../services/book.service';
 
 // Function to add a new book
-export const addBook = async (req: Request, res: Response) => {
+export const addBook = async (req: Request, res: Response): Promise<void> => {
 
   try {
     const MOCK_USER_ID = "wszxwub7"; // Replace with actual user ID from authentication context
@@ -12,7 +12,8 @@ export const addBook = async (req: Request, res: Response) => {
 
     // Validate required fields
     if (!bookData.title) {
-      return res.status(400).json({ message: 'El título es obligatorio.' });
+      res.status(400).json({ message: 'El título es obligatorio.' });
+      return;
     }
 
     // Create the book using the book service
@@ -26,7 +27,7 @@ export const addBook = async (req: Request, res: Response) => {
 };
 
 // Function to fetch all books
-export const fetchAllBooks = async (req: Request, res: Response) => {
+export const fetchAllBooks = async (req: Request, res: Response): Promise<void> => {
   console.log('>> Fetching all books...');
 
   try {
@@ -37,7 +38,8 @@ export const fetchAllBooks = async (req: Request, res: Response) => {
 
     // Check if books were found
     if (books.length === 0) {
-      return res.status(404).json({ message: 'No books found.' });
+      res.status(404).json({ message: 'No books found.' });
+      return;
     }
 
     // Return the list of books
@@ -50,13 +52,14 @@ export const fetchAllBooks = async (req: Request, res: Response) => {
 };
 
 // Function to delete a book by ID
-export const deleteBook = async (req: Request, res: Response) => {
+export const deleteBook = async (req: Request, res: Response): Promise<void> => {
   const bookId = req.params.id;
 
   try {
     // Validate book ID
     if (!bookId) {
-      return res.status(400).json({ message: 'Book ID is required.' });
+      res.status(400).json({ message: 'Book ID is required.' });
+      return;
     }
 
     // Delete the book using the book service
@@ -72,13 +75,14 @@ export const deleteBook = async (req: Request, res: Response) => {
 }
 
 // Function to fetch a book by ID
-export const getBookById = async (req: Request, res: Response) => {
+export const getBookById = async (req: Request, res: Response): Promise<void> => {
   const bookId = req.params.id;
 
   try {
     // Validate book ID
     if (!bookId) {
-      return res.status(400).json({ message: 'Book ID is required.' });
+      res.status(400).json({ message: 'Book ID is required.' });
+      return;
     }
 
     // Fetch the book using the book service
@@ -86,7 +90,8 @@ export const getBookById = async (req: Request, res: Response) => {
 
     // Check if the book was found
     if (!book) {
-      return res.status(404).json({ message: 'Book not found.' });
+      res.status(404).json({ message: 'Book not found.' });
+      return;
     }
 
     // Return the book details
@@ -99,19 +104,21 @@ export const getBookById = async (req: Request, res: Response) => {
 }
 
 // Function to update a book by ID
-export const updateBook = async (req: Request, res: Response) => {
+export const updateBook = async (req: Request, res: Response): Promise<void> => {
   const bookId = req.params.id;
   const bookData = req.body;
 
   try {
     // Validate book ID
     if (!bookId) {
-      return res.status(400).json({ message: 'Book ID is required.' });
+      res.status(400).json({ message: 'Book ID is required.' });
+      return;
     }
 
     // Validate required fields
     if (!bookData.title) {
-      return res.status(400).json({ message: 'El título es obligatorio.' });
+      res.status(400).json({ message: 'El título es obligatorio.' });
+      return;
     }
 
     // Update the book using the book service
