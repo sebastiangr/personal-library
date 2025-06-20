@@ -1,9 +1,16 @@
 import { Router, Request, Response } from "express";
 import * as bookController from "../controllers/book.controller";
 import { validate } from "../middlewares/validateRequest";
+import { isAuthenticated } from '../middlewares/isAuthenticated';
 import { createBookSchema, updateBookSchema } from "../schemas/book.schema";
  
 const router = Router();
+
+// Route to fetch all books GET
+// This route is protected by the isAuthenticated middleware
+// It ensures that only authenticated users can access it
+// We can also add validation for the request body using Zod schemas ***
+router.use(isAuthenticated); // Middleware to protect all routes
 
 // Route to add a new book POST
 router.post('/', validate(createBookSchema), bookController.addBook);

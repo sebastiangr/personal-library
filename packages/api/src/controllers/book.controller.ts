@@ -5,10 +5,10 @@ import * as bookService from '../services/book.service';
 export const addBook = async (req: Request, res: Response): Promise<void> => {
 
   try {
-    const MOCK_USER_ID = "wszxwub7"; // Replace with actual user ID from authentication context
+    const userId = req.user?.id; // Get user ID from authenticated request
 
     // Get book data from request body
-    const bookData = { ...req.body, userId: MOCK_USER_ID };
+    const bookData = { ...req.body, userId };
 
     // Validate required fields
     if (!bookData.title) {
@@ -26,15 +26,16 @@ export const addBook = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// TODO: Add userId to the controller methods
 // Function to fetch all books
 export const fetchAllBooks = async (req: Request, res: Response): Promise<void> => {
   console.log('>> Fetching all books...');
 
   try {
-    const MOCK_USER_ID = "wszxwub7"; // Replace with actual user ID from authentication context
+    const userId = req.user?.id; // Get user ID from authenticated request
 
     // Get all books for the user
-    const books = await bookService.getAllBooks(MOCK_USER_ID);
+    const books = await bookService.getAllBooks(userId);
 
     // Check if books were found
     if (books.length === 0) {
