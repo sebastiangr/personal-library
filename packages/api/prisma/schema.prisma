@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// --- DB MODELS ---
+// --- DB MODELS --- //
 
 // USER MODEL
 model User {
@@ -36,18 +36,30 @@ model Book {
   id            String    @id @default(uuid())
   title         String
   subtitle      String?
+
   isbn_13       String?   @unique
   isbn_10       String?   @unique
-  page_count    Int?
-  cover_image_url String?
-  published_year Int?
-  description   String?
-  
-  ownerId       String
-  owner         User      @relation("BookOwner", fields: [ownerId], references: [id])
 
-  //Book state
+  published_year  Int?
+  edition       String? 
+  page_count    Int?
+  language      String?
+  description   String?
+
+  cover_image_url String?
+  small_thumbnail_url String?
+
+  format        BookFormat @default(PHYSICAL)
+  type          BookType   @default(BOOK)
+
+  // Owner and status of the book
+  ownerId       String
+  owner         User      @relation("BookOwner", fields: [ownerId], references: [id])  
   status        BookStatus @default(AVAILABLE)
+
+  rating        Int?      @db.SmallInt
+  personal_notes String?   @db.Text
+  read_status   ReadStatus @default(UNREAD)  
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -63,11 +75,33 @@ model Book {
   activeLoans   Loan?
 }
 
+// ENUMS
+enum BookFormat {
+  PHYSICAL
+  DIGITAL
+}
+
+enum BookType {
+  BOOK
+  MAGAZINE
+  COMIC
+  ARTICLE
+  JOURNAL
+  OTHER
+}
+
 enum BookStatus {
   AVAILABLE
   LOANED
   WISHLIST
   LOST
+}
+
+enum ReadStatus {
+  UNREAD
+  READING
+  READ
+  DROPPED // Lo empecé pero lo abandoné
 }
 
 // LOAN MODEL
@@ -96,18 +130,43 @@ model Loan {
 // --- GLOBAL MODELS --- //
 model Author {
   id          String   @id @default(uuid())
-  name        String   @unique
-  books       Book[]
+  name        String   
+
+  birth_date      DateTime? @db.Date 
+  death_date      DateTime? @db.Date
+  birth_city      String?
+  birth_country   String?
+  nationality     String?
+  gender          String?   
+  bio             String?   @db.Text
+  photo_url       String?   @db.Text
+  
+  books           Book[]
+  
+  @@unique([name])
+  @@index([name])
 }
 
 model Publisher {
   id          String   @id @default(uuid())
   name        String   @unique
+  
+  country     String?
+  city        String?
+  website     String?   @db.Text
+
   books       Book[]
+
+  @@index([name])
 }
 
 model Genre {
   id          String   @id @default(uuid())
   name        String   @unique
+  
+  description String?  @db.Text
+
   books       Book[]
+
+  @@index([name])
 }
