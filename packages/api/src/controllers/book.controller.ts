@@ -2,10 +2,10 @@ import { Request, Response } from 'express';
 import * as bookService from '../services/book.service';
 
 // Function to add a new book
-export const addBook = async (req: Request, res: Response): Promise<void> => {
+export const handleCreateBook = async (req: Request, res: Response): Promise<void> => {
 
   try {
-    const userId = req.user?.id; // Get user ID from authenticated request
+    const userId = req.user!.id; // Get user ID from authenticated request NOT null
 
     // Get book data from request body
     const bookData = { ...req.body, userId };
@@ -17,22 +17,22 @@ export const addBook = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Create the book using the book service
-    const newBook = await bookService.createbook(bookData);
+    const newBook = await bookService.createBook(bookData);
     
     // Return the created book
     res.status(201).json(newBook);
   } catch (error) {    
+    console.error("Error in function addBook:", error);
     res.status(500).json({ message: 'Error creating book.', error });
   }
 };
 
-// TODO: Add userId to the controller methods
 // Function to fetch all books
-export const fetchAllBooks = async (req: Request, res: Response): Promise<void> => {
+export const handleGetAllBooks = async (req: Request, res: Response): Promise<void> => {
   console.log('>> Fetching all books...');
 
   try {
-    const userId = req.user?.id; // Get user ID from authenticated request
+    const userId = req.user!.id; // Get user ID from authenticated request NOT null
 
     // Get all books for the user
     const books = await bookService.getAllBooks(userId);
@@ -47,49 +47,21 @@ export const fetchAllBooks = async (req: Request, res: Response): Promise<void> 
     console.log('- Books fetched successfully, total Books in DB:', books.length);
     res.status(200).json(books);    
   } catch (error) {
-    console.error('Error fetching books:', error);
+    console.error('Error fetching books function fetchAllBooks:', error);
     res.status(500).json({ message: 'Error obtaining books.', error });
   }
 };
 
-// Function to delete a book by ID
-export const deleteBook = async (req: Request, res: Response): Promise<void> => {
-  const bookId = req.params.id;
-
-  try {
-    // Validate book ID
-    if (!bookId) {
-      res.status(400).json({ message: 'Book ID is required.' });
-      return;
-    }
-
-    // Delete the book using the book service
-    const deletedBook = await bookService.deleteBook(bookId);
-
-    // Return the deleted book
-    console.log(`- Book with ID ${bookId} deleted successfully.`);
-    res.status(200).json(deletedBook);
-  } catch (error) {
-    console.error('Error deleting book:', error);
-    res.status(500).json({ message: 'Error deleting book.', error });
-  }
-}
-
 // Function to fetch a book by ID
-export const getBookById = async (req: Request, res: Response): Promise<void> => {
-  const bookId = req.params.id;
+export const handleGetBookById = async (req: Request, res: Response): Promise<void> => {
 
   try {
+    const userId = req.user!.id;
+    const { id: bookId } = req.params;
+    
+    const book = await bookService.getBookById(bookId, userId);
+
     // Validate book ID
-    if (!bookId) {
-      res.status(400).json({ message: 'Book ID is required.' });
-      return;
-    }
-
-    // Fetch the book using the book service
-    const book = await bookService.getBookById(bookId);
-
-    // Check if the book was found
     if (!book) {
       res.status(404).json({ message: 'Book not found.' });
       return;
@@ -105,31 +77,52 @@ export const getBookById = async (req: Request, res: Response): Promise<void> =>
 }
 
 // Function to update a book by ID
-export const updateBook = async (req: Request, res: Response): Promise<void> => {
-  const bookId = req.params.id;
-  const bookData = req.body;
+export const handleUpdateBook = async (req: Request, res: Response): Promise<void> => {
 
   try {
-    // Validate book ID
-    if (!bookId) {
-      res.status(400).json({ message: 'Book ID is required.' });
+
+    const userId = req.user!.id; // Get user ID from authenticated request NOT null
+    const { id: bookId } = req.params; // Get book ID from request parameters
+    const bookData = req.body; // Get book data from request body
+
+    const updateBook = await bookService.updateBook(bookId, userId, bookData);
+
+    if (!updateBook) {
+      res.status(404).json({ message: 'Book not found.' });
       return;
     }
 
-    // Validate required fields
-    if (!bookData.title) {
-      res.status(400).json({ message: 'El título es obligatorio.' });
-      return;
-    }
-
-    // Update the book using the book service
-    const updatedBook = await bookService.updateBook(bookId, bookData);
-
-    // Return the updated book
     console.log(`- Book with ID ${bookId} updated successfully.`);
-    res.status(200).json(updatedBook);
+    res.status(200).json(updateBook);
+
+  } catch (error: any) {
+    console.error('Error in updateBookById:', error);
+    
+    if (error.code === 'P2002') {
+      res.status(409).json({ message: 'Book with this ISBN already exists.' });      
+    } else {
+      res.status(500).json({ message: 'Error updating book.', error });
+    }    
+  }
+}
+
+// Function to delete a book by ID
+export const handleDeleteBook = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user!.id; // Get user ID from authenticated request NOT null
+    const { id: bookId } = req.params; // Get book ID from request parameters
+
+    const deletedBook = await bookService.deleteBook(bookId, userId);
+
+    if (!deletedBook) {
+      res.status(404).json({ message: 'Book not found.' });
+      return;
+    }
+
+    console.log(`- Book with ID ${bookId} deleted successfully.`);    
+    res.status(204).send();
   } catch (error) {
-    console.error('Error updating book:', error);
-    res.status(500).json({ message: 'Error updating book.', error });
+    console.error('Error in deleteBookById:', error);
+    res.status(500).json({ message: 'Error deleting book.', error });
   }
 }

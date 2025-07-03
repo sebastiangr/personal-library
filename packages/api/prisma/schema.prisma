@@ -12,6 +12,7 @@ datasource db {
 
 // --- DB MODELS ---
 
+// USER MODEL
 model User {
   id            String    @id @default(uuid())
   email         String    @unique
@@ -20,9 +21,17 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
-  books         Book[] // A user can have multiple books
+  // Books owned by the user
+  ownedBooks    Book[]    @relation("BookOwner")// A user can have multiple books
+
+  // Books borrowed by the user
+  borrowedLoans Loan[]    @relation("Borrower")// A user can borrow multiple books
+
+  // Books lent by the user
+  lentLoans     Loan[]    @relation("Owner")// A user can lend multiple
 }
 
+// BOOK MODEL
 model Book {
   id            String    @id @default(uuid())
   title         String
@@ -34,11 +43,71 @@ model Book {
   published_year Int?
   description   String?
   
+  ownerId       String
+  owner         User      @relation("BookOwner", fields: [ownerId], references: [id])
+
+  //Book state
+  status        BookStatus @default(AVAILABLE)
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  // A book belongs to a user
-  // This is a many-to-one relationship, meaning multiple books can belong to one user
-  user          User      @relation(fields: [userId], references: [id])
-  userId        String
+  authors       Author[]
+  genres        Genre[]
+
+  // Publisher 
+  publisherId   String?
+  publisher     Publisher? @relation(fields: [publisherId], references: [id])
+
+  // One book can have oly one active loan at a time
+  activeLoans   Loan?
+}
+
+enum BookStatus {
+  AVAILABLE
+  LOANED
+  WISHLIST
+  LOST
+}
+
+// LOAN MODEL
+model Loan {
+  id            String    @id @default(uuid())
+  bookId        String    @unique
+  book          Book      @relation(fields: [bookId], references: [id]) 
+
+  // Owner of the book
+  ownerId       String
+  owner         User      @relation("Owner", fields: [ownerId], references: [id])
+
+  // Borrower of the book
+  borrowerId    String
+  borrower      User      @relation("Borrower", fields: [borrowerId], references: [id])
+
+  loanDate      DateTime  @default(now())
+  excpectedReturnDate DateTime?
+  actualReturnDate DateTime?
+
+  @@index([ownerId])
+  @@index([borrowerId])
+}
+
+
+// --- GLOBAL MODELS --- //
+model Author {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  books       Book[]
+}
+
+model Publisher {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  books       Book[]
+}
+
+model Genre {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  books       Book[]
 }

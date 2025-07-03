@@ -5,7 +5,10 @@ import jwt from 'jsonwebtoken';
 declare global {
   namespace Express {
     export interface Request {
-      user?: any; // Puedes definir un tipo más estricto si quieres
+      user?: {
+        id: string;
+        email: string;
+      };      
     }
   }
 }
@@ -19,16 +22,24 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
     return;
   }
 
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error('La clave secreta de JWT no está configurada.');
-  }
-
   try {
-    const decoded = jwt.verify(token, secret);
-    req.user = (decoded as any).user; // Añadimos el payload del token a la request
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      // Este es un error del servidor, no del cliente.
+      console.error('La clave secreta de JWT no está configurada.');
+      res.status(500).json({ message: 'Error interno del servidor.' });
+      return;
+    }
+
+    const decodedPayload = jwt.verify(token, secret);
+
+    // Añadimos el payload del usuario a la request.
+    // TypeScript ahora sabe que 'req.user' es una propiedad válida.
+    req.user = (decodedPayload as any).user; 
+    
     next();
   } catch (error) {
-    res.status(403).json({ message: 'Token no válido o expirado.' }); // 403 Forbidden
+    // 403 Forbidden
+    res.status(403).json({ message: 'Token no válido o expirado.' });
   }
 };
