@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import authRoutes from './routes/auth.routes'; // Import auth routes
 import bookRoutes from './routes/book.routes'; // Import book routes
+import authorRoutes from './routes/author.routes';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -28,8 +29,10 @@ app.get('/', (req: Request, res: Response) => {
   `);
 });
 
+// TODO: Routes, controllers and services for Publishers and Genres
 app.use('/api/auth', authRoutes); // Use auth routes under /api/auth
 app.use('/api/books', bookRoutes); // Use book routes under /api/books
+app.use('/api/authors', authorRoutes); // Use author routes under /api/authors
 
 app.listen(PORT, () => {
   console.log(`🚀  Server running on http://localhost:${PORT}`);

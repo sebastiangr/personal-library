@@ -23,6 +23,10 @@ export const createBookSchema = z.object({
     cover_image_url: z.string().url('La URL de la imagen de portada no es válida').optional(),
     
     description: z.string().optional(),
+
+    authorIds: z.array(z.string().uuid(), { required_error: 'Se requiere al menos un autor' }).min(1),
+    genreIds: z.array(z.string().uuid()).optional(),
+    publisherId: z.string().uuid().optional(),
   }),
 });
 
