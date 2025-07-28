@@ -30,8 +30,10 @@ export const createBookSchema = z.object({
     read_status: z.nativeEnum(ReadStatus).optional(),
     format: z.nativeEnum(BookFormat).optional(),
     type: z.nativeEnum(BookType).optional(),
-
-    authorIds: z.array(z.string().uuid()).min(1),
+    
+    authorIds: z.array(z.string().uuid(), {
+      invalid_type_error: "authorIds debe ser un array de UUIDs de autores"
+    }).optional(),
     genreIds: z.array(z.string().uuid()).optional(),
     publisherId: z.string().uuid().optional(),
   }),

@@ -46,20 +46,36 @@ interface BookCreationInput {
 
 // Function to create a new book
 export const createBook = async (data: BookCreationInput): Promise<Book> => {
-  const { title, ownerId, authorIds, genreIds, publisherId, ...otherData } = data;
+  // const { title, ownerId, authorIds, genreIds, publisherId, ...otherData } = data;
+  const { ownerId, authorIds, genreIds, publisherId, ...bookData } = data;
 
   return prisma.book.create({
     data: {
-      title,
-      ...otherData,
-      owner: { connect: { id: ownerId } }, 
+      // title,
+      // ...otherData,
+      ...bookData,
+
+      owner: { 
+        connect: { 
+          id: ownerId,
+        },
+      }, 
       authors: {
-        connect: authorIds.map(id => ({ id })),
+        // connect: authorIds?.map(id => ({ id })),
+        connect: authorIds?.map(id => ({ id })) || []
       },
       genres: {
-        connect: genreIds?.map(id => ({ id })),
+        connect: genreIds?.map(id => ({ id })) || [],
       },
       publisher: publisherId ? { connect: { id: publisherId } } : undefined,
+    },
+    include: {
+      owner: {
+        select: { id: true, name: true, email: true } // Selecciona solo los campos que necesitas
+      },
+      authors: true,
+      genres: true,
+      publisher: true,
     }
   });
 };

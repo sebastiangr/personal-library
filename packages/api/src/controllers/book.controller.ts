@@ -5,19 +5,25 @@ import * as bookService from '../services/book.service';
 export const handleCreateBook = async (req: Request, res: Response): Promise<void> => {
 
   try {
-    const userId = req.user!.id; // Get user ID from authenticated request NOT null
+    // const userId = req.user!.id; // Get user ID from authenticated request NOT null
+    const user = req.user!; // Get user from authenticated request
+    const requestBody = req.body; // Get request body (title, authorIds, genreIds, etc.)
 
     // Get book data from request body
-    const bookData = { ...req.body, userId };
+    // const bookData = { ...req.body, userId };
 
     // Validate required fields
-    if (!bookData.title) {
-      res.status(400).json({ message: 'El título es obligatorio.' });
-      return;
+    // if (!bookData.title) {
+    //   res.status(400).json({ message: 'El título es obligatorio.' });
+    //   return;
+    // }
+    const bookCreationData = {
+      ...requestBody,
+      ownerId: user.id, // Set the ownerId to the authenticated user's ID
     }
 
     // Create the book using the book service
-    const newBook = await bookService.createBook(bookData);
+    const newBook = await bookService.createBook(bookCreationData);
     
     // Return the created book
     res.status(201).json(newBook);

@@ -64,6 +64,7 @@ model Book {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // Many to Many relationships
   authors       Author[]
   genres        Genre[]
 
@@ -141,6 +142,7 @@ model Author {
   bio             String?   @db.Text
   photo_url       String?   @db.Text
   
+  // Many to Many relationship with books
   books           Book[]
   
   @@unique([name])
@@ -155,6 +157,7 @@ model Publisher {
   city        String?
   website     String?   @db.Text
 
+  // Many to Many relationship with books
   books       Book[]
 
   @@index([name])
@@ -166,6 +169,7 @@ model Genre {
   
   description String?  @db.Text
 
+  // Many to Many relationship with books
   books       Book[]
 
   @@index([name])
