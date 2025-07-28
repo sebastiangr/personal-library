@@ -10,7 +10,7 @@ import authorRoutes from './routes/author.routes';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3003;
+const PORT = Number(process.env.PORT) || 3003;
 
 // Middlewares
 app.use(cors()); // Enables CORS for all routes
@@ -34,6 +34,12 @@ app.use('/api/auth', authRoutes); // Use auth routes under /api/auth
 app.use('/api/books', bookRoutes); // Use book routes under /api/books
 app.use('/api/authors', authorRoutes); // Use author routes under /api/authors
 
-app.listen(PORT, () => {
-  console.log(`🚀  Server running on http://localhost:${PORT}`);
-});
+// app.listen(PORT, '0.0.0.0', () => {
+//   console.log(`Server running on htt`)
+//   console.log(`🚀  Server running on http://localhost:${PORT}`);
+// });
+
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+})

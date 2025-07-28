@@ -21,3 +21,7 @@ Thumbs.db
 # Archivos del editor
 .vscode/
 .idea/
+codeviz-diagram-2025-07-12T23-52-25.drawio
+*.code-workspace
+*.drawio
+CLAUDE.md

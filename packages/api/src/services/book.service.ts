@@ -1,14 +1,43 @@
 import { prisma } from '../prisma/client';
-import { Book, Prisma } from '@prisma/client';
+// import { Book, Prisma } from '@prisma/client';
 
 // Type definitions for book creation and update data
 // These types are used to define the structure of book data when creating or updating a book
-export type BookCreateData = Prisma.BookCreateInput;
-export type BookUpdateData = Prisma.BookUpdateInput;
+// export type BookCreateData = Prisma.BookCreateInput;
+// export type BookUpdateData = Prisma.BookUpdateInput;
+
+import {
+  Book,
+  Prisma,
+  BookStatus,
+  ReadStatus,
+  BookFormat,
+  BookType
+} from '@prisma/client';
 
 // TODO: Finish adding all fields to the BookCreationInput type (2.2 step)
+// This interface defines the structure of the input data required to create a new book
 interface BookCreationInput {
   title: string;
+  subtitle?: string;
+
+  isbn_13?: string;
+  isbn_10?: string;
+  
+  published_year?: number;
+  edition?: string;
+  page_count?: number;
+  language?: string;
+  description?: string;
+  cover_image_url?: string;
+  small_thumbnail_url?: string;
+  
+  status?: BookStatus;
+  read_status?: ReadStatus;
+  format?: BookFormat;
+  type?: BookType;
+  
+  // Relational fields
   ownerId: string;
   authorIds: string[];
   genreIds?: string[];
@@ -16,40 +45,53 @@ interface BookCreationInput {
 }
 
 // Function to create a new book
-// This function takes book data as input and returns the created book object
-export const createBook = async (data: BookCreateData): Promise<Book> => {
+export const createBook = async (data: BookCreationInput): Promise<Book> => {
+  const { title, ownerId, authorIds, genreIds, publisherId, ...otherData } = data;
+
   return prisma.book.create({
-    data,
+    data: {
+      title,
+      ...otherData,
+      owner: { connect: { id: ownerId } }, 
+      authors: {
+        connect: authorIds.map(id => ({ id })),
+      },
+      genres: {
+        connect: genreIds?.map(id => ({ id })),
+      },
+      publisher: publisherId ? { connect: { id: publisherId } } : undefined,
+    }
   });
 };
 
 // Function to fetch all books
-// This function retrieves all books from the database, ordered by creation date
 export const getAllBooks = async (ownerId: string): Promise<Book[]> => {
   return prisma.book.findMany({
-    where: {
-      ownerId,
+    where: { ownerId: ownerId },
+    include: {
+      authors: true,
+      genres: true,
+      publisher: true
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy: { createdAt: 'desc' },
   });
 };
 
 // Function to fetch a book by its ID
-// This function takes a book ID and user ID as input and returns the book if it exists
 export const getBookById = async (id: string, ownerId: string): Promise<Book | null> => {
   return prisma.book.findFirst({
-    where: {
-      id,
-      ownerId,
-    },
+    where: { id, ownerId: ownerId },
+    include: {
+      authors: true,
+      genres: true,
+      publisher: true
+    },    
   });
 };
 
 // Function to update a book by its ID
 // This function takes a book ID, user ID, and update data as input and returns the updated book object
-export const updateBook = async (id: string, ownerId: string, data: BookUpdateData): Promise<Book | null> => {
+export const updateBook = async (id: string, ownerId: string, data: BookCreationInput): Promise<Book | null> => {
   try {    
     // It uses 'updateMany' to ensure that only the book belonging to the user can be updated
     const result = await prisma.book.updateMany({
@@ -91,81 +133,3 @@ export const deleteBook = async (id: string, ownerId: string): Promise<Book | nu
   
   return bookToDelete;
 };
-
-// export const getAllBooks = async (userId: string): Promise<Book[]> => {
-//   try {
-//     const books = await prisma.book.findMany({
-//       where: {
-//         userId: userId, // Filter books by user ID
-//       },
-//       orderBy: {
-//         createdAt: 'desc',
-//       },            
-//     });
-//     return books;
-//   } catch (error) {
-//     console.error('Error fetching books:', error);
-//     throw new Error('Failed to fetch books');
-//   }
-// };
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // Function to delete a book by its ID
-// // This function takes the ID of the book to delete as input and returns a boolean indicating success
-// export const deleteBook = async (bookId: string): Promise<Book> => {
-//   try {
-//     const deletedBook = await prisma.book.delete({
-//       where: {
-//         id: bookId,
-//       },
-//     });
-//     return deletedBook;
-//   } catch (error) {
-//     console.error('Error deleting book:', error);
-//     throw new Error('Failed to delete book');
-//   }
-// }
-
-// // Function to fetch a book by its ID
-// // This function takes the ID of the book to fetch as input and returns the book object or null if not found
-// export const getBookById = async (bookId: string): Promise<Book | null> => {
-//   try {
-//     const book = await prisma.book.findUnique({
-//       where: {
-//         id: bookId,
-//       },
-//     });
-//     return book;
-//   } catch (error) {
-//     console.error('Error fetching book by ID:', error);
-//     throw new Error('Failed to fetch book by ID');
-//   }
-// }
-
-// // Function to update a book by its ID
-// // This function takes the ID of the book to update and the new data as input, and returns the updated book object
-// export const updateBook = async (bookId: string, bookData: Partial<BookCreateData>): Promise<Book> => {
-//   try {
-//     const updatedBook = await prisma.book.update({
-//       where: {
-//         id: bookId,
-//       },
-//       data: bookData,
-//     });
-//     return updatedBook;
-//   } catch (error) {
-//     console.error('Error updating book:', error);
-//     throw new Error('Failed to update book');
-//   }
-// }
