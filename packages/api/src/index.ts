@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.routes'; // Import auth routes
 import bookRoutes from './routes/book.routes'; // Import book routes
 import authorRoutes from './routes/author.routes';
 import publisherRoutes from './routes/publisher.routes'; // Import publisher routes
+import genresRoutes from './routes/genre.routes';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -38,9 +39,11 @@ app.use('/api/authors', authorRoutes); // Use author routes under /api/authors
 //   res.status(501).json({ message: 'Publisher routes not implemented yet.' });
 // });
 app.use('/api/publishers', publisherRoutes); // Use publisher routes under /api/publishers
-app.use('/api/genres', (req: Request, res: Response) => {
-  res.status(501).json({ message: 'Genre routes not implemented yet.' });
-});
+app.use('/api/genres', genresRoutes); // Use genre routes under /api/genres
+// app.use('/api/genres', (req: Request, res: Response) => {
+//   res.status(501).json({ message: 'Genre routes not implemented yet.' });
+// });
+
 app.use('/coffee', (req: Request, res: Response) => {
   res.status(418).json({
     message: "I'm a teapot, I cannot brew coffee (dummy response)",
