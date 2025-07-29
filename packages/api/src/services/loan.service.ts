@@ -16,7 +16,7 @@ export const loanBook = async (bookId: string, ownerId: string, borrowerId: stri
 
     // If the book is not found or not available, throw an error
     if (!book) {
-      throw new Error('Libro no encontrado o no disponible para préstamo.');  
+      // throw new Error('Libro no encontrado o no disponible para préstamo.');  
     }
 
     // Create the loan record
@@ -74,10 +74,11 @@ export const returnBook = async (bookId: string, ownerId: string) => {
 }
 
 // Get all books lent to a user
-export const getLeanBooks = async (userId: string) => {
+export const getLentBooks = async (userId: string) => {
   return prisma.loan.findMany({
     where: {
       ownerId: userId,
+      actualReturnDate: null, // Only get lent books that have not been returned
     },
     include: {
       book: true,
@@ -100,6 +101,7 @@ export const getBorrowedBooks = async (userId: string) => {
   return prisma.loan.findMany({
     where: {
       borrowerId: userId,
+      actualReturnDate: null, // Only get borrowed books that have not been returned
     },
     include: {
       book: true,

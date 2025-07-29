@@ -35,7 +35,7 @@ export const handleReturnBook = async (req: Request, res: Response): Promise<voi
 export const handleGetLentBooks = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
-    const loans = await loanService.getLeanBooks(userId);
+    const loans = await loanService.getLentBooks(userId);
     res.status(200).json(loans);
   } catch (error: any) {
     res.status(500).json({ message: "Error al obtener los libros prestados." });
