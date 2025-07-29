@@ -118,3 +118,27 @@ export const getBorrowedBooks = async (userId: string) => {
     },
   });
 }
+
+export const getLentBooksHistory = async (userId: string) => {
+  return prisma.loan.findMany({
+    where: {
+      ownerId: userId,
+      actualReturnDate: {
+        not: null, // Only get loans that have been returned
+      },
+    },
+    include: {
+      book: true,
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+    orderBy: {
+      loanDate: 'desc',
+    },
+  });
+}

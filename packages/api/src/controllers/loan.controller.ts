@@ -51,3 +51,13 @@ export const handleGetBorrowedBooks = async (req: Request, res: Response): Promi
     res.status(500).json({ message: "Error al obtener los libros pedidos." });
   }
 };
+
+export const handleGetLentBooksHistory = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const history = await loanService.getLentBooksHistory(userId);
+    res.status(200).json(history);
+  } catch (error: any) {
+    res.status(500).json({ message: "Error al obtener el historial de libros prestados." });
+  }
+};

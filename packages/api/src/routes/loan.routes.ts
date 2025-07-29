@@ -10,5 +10,6 @@ router.use(isAuthenticated); // Middleware to protect all routes
 // View borrowed and lent books
 router.get('/lent', loanController.handleGetLentBooks);
 router.get('/borrowed', loanController.handleGetBorrowedBooks);
+router.get('/lent/history', loanController.handleGetLentBooksHistory);
 
 export default router;
