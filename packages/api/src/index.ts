@@ -1,17 +1,18 @@
 
-// --- AÑADE ESTO AL PRINCIPIO DE TODO ---
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('🔥🔥🔥 RECHAZO DE PROMESA NO MANEJADO 🔥🔥🔥');
-  console.error('Razón:', reason);
-  // La siguiente línea es opcional pero muy útil para ver dónde se originó
-  // console.error('Promesa:', promise);
-});
+// TODO: Borrar comments
+// // --- AÑADE ESTO AL PRINCIPIO DE TODO ---
+// process.on('unhandledRejection', (reason, promise) => {
+//   console.error('🔥🔥🔥 RECHAZO DE PROMESA NO MANEJADO 🔥🔥🔥');
+//   console.error('Razón:', reason);
+//   // La siguiente línea es opcional pero muy útil para ver dónde se originó
+//   // console.error('Promesa:', promise);
+// });
 
-process.on('uncaughtException', (err, origin) => {
-  console.error('🔥🔥🔥 EXCEPCIÓN NO CAPTURADA 🔥🔥🔥');
-  console.error('Error:', err);
-  console.error('Origen:', origin);
-});
+// process.on('uncaughtException', (err, origin) => {
+//   console.error('🔥🔥🔥 EXCEPCIÓN NO CAPTURADA 🔥🔥🔥');
+//   console.error('Error:', err);
+//   console.error('Origen:', origin);
+// });
 // --- FIN DEL BLOQUE A AÑADIR ---
 
 console.log("Iniciando...");
@@ -21,6 +22,8 @@ import dotenv from 'dotenv';
 console.log("Importado dotenv");
 import cors from 'cors';
 console.log("Importado cors");
+
+import { appTest } from './app';
 
 import authRoutes from './routes/auth.routes'; // Import auth routes
 console.log("Importado authRoutes");
@@ -32,8 +35,6 @@ import publisherRoutes from './routes/publisher.routes'; // Import publisher rou
 console.log("Importado publisherRoutes");
 import genresRoutes from './routes/genre.routes';
 console.log("Importado genresRoutes");
-
-
 import loanRoutes from './routes/loan.routes';
 
 
@@ -86,9 +87,17 @@ app.use('/coffee', (req: Request, res: Response) => {
   });
 });
 
+// Inicia el servidor solo si no estamos en un entorno de test
+if (process.env.NODE_ENV !== 'test') {
+  appTest.listen(PORT, () => {
+    console.log(`🚀 Server TEST running on http://localhost:${PORT}`);
+  });
+}
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀  Server running on http://localhost:${PORT}`);
 });
+
 
 
 // app.listen(PORT, '0.0.0.0', () => {
