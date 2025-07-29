@@ -120,7 +120,7 @@ model Loan {
   borrower      User      @relation("Borrower", fields: [borrowerId], references: [id])
 
   loanDate      DateTime  @default(now())
-  excpectedReturnDate DateTime?
+  expectedReturnDate DateTime?
   actualReturnDate DateTime?
 
   @@index([ownerId])
