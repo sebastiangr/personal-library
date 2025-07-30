@@ -5,20 +5,19 @@ import { prisma } from '../prisma/client';
 let token: string;
 let userId: string;
 
-// --- SETUP Y TEARDOWN ---
-
-// 1. Antes de TODOS los tests en este archivo, crea un usuario y obtén su token
+// --- SETUP & TEARDOWN ---
+// 1. Before all tests, create a user and get its token
 beforeAll(async () => {
-  // Limpia la DB por si acaso
+  // Clean the database before tests
   await prisma.user.deleteMany({});
   
-  // Crea el usuario
+  // Create a user and get its token
   const userResponse = await request(app)
     .post('/api/auth/register')
     .send({ email: 'book-test-user@example.com', password: 'password123' });
   userId = userResponse.body.id;
 
-  // Haz login para obtener el token
+  // Log in to get the token
   const loginResponse = await request(app)
     .post('/api/auth/login')
     .send({ email: 'book-test-user@example.com', password: 'password123' });
@@ -26,12 +25,12 @@ beforeAll(async () => {
   console.log('Token obtenido:', token);
 });
 
-// 2. Antes de CADA test, limpia la tabla de libros para evitar interferencias
+// 2. Before each test, clean the books table to avoid interference
 beforeEach(async () => {
   await prisma.book.deleteMany({});
 });
 
-// 3. Después de TODOS los tests, limpia el usuario
+// 3. After all tests, clean the user
 afterAll(async () => {
   await prisma.user.deleteMany({});
 });
