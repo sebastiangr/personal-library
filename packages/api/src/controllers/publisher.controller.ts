@@ -91,16 +91,14 @@ export const handleDeletePublisher = async (req: Request, res: Response): Promis
     // Delete the publisher using the publisher service
     const deletedPublisher = await publisherService.deletePublisher(publisherId);
 
-    // Check if publisher was deleted
-    if (!deletedPublisher) {
-      res.status(404).json({ message: `Publisher with ID ${publisherId} not found.` });
-      return;
-    }
-
     // Return success message
-    res.status(200).json({ message: `Publisher with ID ${publisherId} deleted successfully.` });
-  } catch (error) {
-    console.error('Error deleting publisher:', error);
-    res.status(500).json({ message: 'Error deleting publisher.', error });
+    res.status(200).json({ message: `Publisher ${deletedPublisher.name} deleted successfully.` });
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      res.status(404).json({ message: 'Publisher not found' });
+    } else {
+      console.error('Error deleting publisher:', error);
+      res.status(500).json({ message: 'Error deleting publisher.', error });
+    }
   }
 }

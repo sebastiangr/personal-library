@@ -4,7 +4,18 @@ import { prisma } from '../prisma/client';
 
 // Limpia la base de datos antes de cada test para asegurar un estado limpio
 beforeEach(async () => {
+  await prisma.loan.deleteMany({});      // Los préstamos dependen de Libros y Usuarios
+  await prisma.book.deleteMany({});      // Los libros dependen de Autores, Géneros, Publishers y Usuarios
+  await prisma.author.deleteMany({});    // Entidades principales
+  await prisma.genre.deleteMany({});
+  await prisma.publisher.deleteMany({});
+  await prisma.user.deleteMany({}); 
+});
+
+// 3. After all tests, clean the users
+afterAll(async () => {
   await prisma.user.deleteMany({});
+  await prisma.$disconnect();
 });
 
 // describe() agrupa tests relacionados

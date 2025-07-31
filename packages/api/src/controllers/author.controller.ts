@@ -66,7 +66,8 @@ export const handleDeleteAuthor = async (req: Request, res: Response): Promise<v
   const { id } = req.params;
   try {
     const deletedAuthor = await authorService.deleteAuthor(id);
-    res.status(200).json(deletedAuthor);
+    // res.status(200).json(deletedAuthor);
+    res.status(200).json({ message: `Author ${deletedAuthor.name} deleted successfully.` });
   } catch (error: any) {
     if (error.code === 'P2025') {
       res.status(404).json({ message: 'Author not found' });

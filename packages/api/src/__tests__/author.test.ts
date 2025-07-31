@@ -26,12 +26,19 @@ beforeAll(async () => {
 
 // 2. Before each test, clean the books table to avoid interference
 beforeEach(async () => {
-  await prisma.author.deleteMany({});
+  await prisma.loan.deleteMany({});      // Los préstamos dependen de Libros y Usuarios
+  await prisma.book.deleteMany({});      // Los libros dependen de Autores, Géneros, Publishers y Usuarios
+  await prisma.author.deleteMany({});    // Entidades principales
+  await prisma.genre.deleteMany({});
+  await prisma.publisher.deleteMany({});
+  await prisma.user.deleteMany({}); 
 });
 
 // 3. After all tests, clean the user
 afterAll(async () => {
-  await prisma.user.deleteMany({});
+  // await prisma.user.deleteMany({});
+  await prisma.author.deleteMany({});
+  await prisma.$disconnect();
 });
 
 // --- TEST SUITE for Authors ---
@@ -122,31 +129,14 @@ describe('Author Endpoints', () => {
       .send({ name: 'George Orwell', bio: 'Author of 1986' });
 
     const authorId = createResponse.body.id;
+    const authorName = createResponse.body.name;
 
     const deleteResponse = await request(app)
       .delete(`/api/authors/${authorId}`)
       .set('Authorization', `Bearer ${token}`);
 
-    expect(deleteResponse.statusCode).toBe(200);
-
-    // const fetchResponse = await request(app)
-    //   .get(`/api/authors/${authorId}`)
-    //   .set('Authorization', `Bearer ${token}`);
-    // expect(fetchResponse.statusCode).toBe(404);          
+    expect(deleteResponse.statusCode).toBe(200);      
+    expect(deleteResponse.body).toHaveProperty('message', `Author ${authorName} deleted successfully.`);
   });
 
-  // it('Should delete an author successfully', async () => {
-  //   const createResponse = await request(app)
-  //     .post('/api/authors')
-  //     .set('Authorization', `Bearer ${token}`)
-  //     .send({ name: 'Ray Bradbury', bio: 'Author of Fahrenheit 451' });
-    
-  //   const authorId = createResponse.body.id;
-
-  //   const deleteResponse = await request(app)
-  //     .delete(`/api/authors/${authorId}`)
-  //     .set('Authorization', `Bearer ${token}`);
-
-  //   expect(deleteResponse.statusCode).toBe(204); // No Content
-  // });
 });

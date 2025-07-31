@@ -8,8 +8,13 @@ let userId: string;
 // --- SETUP & TEARDOWN ---
 // 1. Before all tests, create a user and get its token
 beforeAll(async () => {
-  // Clean the database before tests
-  await prisma.user.deleteMany({});
+  // Clean the database before tests  
+  await prisma.loan.deleteMany({});      // Los préstamos dependen de Libros y Usuarios
+  await prisma.book.deleteMany({});      // Los libros dependen de Autores, Géneros, Publishers y Usuarios
+  await prisma.author.deleteMany({});    // Entidades principales
+  await prisma.genre.deleteMany({});
+  await prisma.publisher.deleteMany({});
+  await prisma.user.deleteMany({});  
   
   // Create a user and get its token
   const userResponse = await request(app)
@@ -33,6 +38,7 @@ beforeEach(async () => {
 // 3. After all tests, clean the user
 afterAll(async () => {
   await prisma.user.deleteMany({});
+  await prisma.$disconnect();
 });
 
 
@@ -146,5 +152,7 @@ describe('Book Endpoints', () => {
       .set('Authorization', `Bearer ${token}`);
     expect(findResponse.statusCode).toBe(404);
   });
+
+  // TODO: Add test for book fields validation
 
 });
