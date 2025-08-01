@@ -20,8 +20,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
-    const { token } = await authService.loginUser({ email, password_hash: password });
-    res.status(200).json({ token });
+    const { token, user } = await authService.loginUser({ email, password_hash: password });
+    res.status(200).json({ token, user });
   } catch (error: any) {
     res.status(401).json({ message: error.message }); // 401 Unauthorized
   }
