@@ -22,6 +22,9 @@ export const handleCreateBook = async (req: Request, res: Response): Promise<voi
       ownerId: user.id, // Set the ownerId to the authenticated user's ID
     }
 
+    //TODO: IMPORTANTE! El libro no puede estar duplicado por ISBN, título y autor. Pero sí pueden haber versiones diferentes del mismo libro.
+    // Mirar bien esto
+
     // Create the book using the book service
     const newBook = await bookService.createBook(bookCreationData);
     
