@@ -19,10 +19,12 @@
     <div>
       {#if authStore.session.user}
         <div class="flex items-center">
-          <a href="/dashboard" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded">Biblioteca</a>
+          <a href="/dashboard" class="text-gray-700 hover:text-blue-6s00 px-3 py-2 rounded">Biblioteca</a>
           <a href="/authors" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded">Autores</a>
           <a href="/genres" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded">Géneros</a>
           <a href="/publishers" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded">Editoriales</a>
+
+          <a href="/books/new" class="text-gray-700 hover:text-blue-600 ml-4 px-3 py-2 rounded">Añadir Libro</a>
           <span class="text-gray-500 mx-4">|</span>
           <span class="text-gray-700 mr-4">Hola, {authStore.session.user.name || authStore.session.user.email}</span>
           <button on:click={handleLogout} class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">

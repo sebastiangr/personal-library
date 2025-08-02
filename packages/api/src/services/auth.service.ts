@@ -3,6 +3,21 @@ import { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+// TODO: Analizar bien y mejorar la seguridad de este servicio, entrega de Token y User.
+
+// FIXME:
+// Flujo Recomendado (Frontend y Backend)
+
+// Frontend: El usuario envía el email y la contraseña.
+// Frontend: Hace un POST a /api/auth/login.
+// Backend: Valida las credenciales y devuelve { token: "..." }.
+// Frontend: Recibe el token y lo guarda de forma segura (en tu auth.store de Svelte, y probablemente en una cookie httpOnly para mayor seguridad).
+// Frontend: Inmediatamente después, hace una segunda petición a un endpoint protegido como GET /api/users/me usando el token recién obtenido en la cabecera Authorization.
+// Backend: El endpoint /api/users/me usa el middleware isAuthenticated, decodifica el token, encuentra al usuario y devuelve sus datos (sin la contraseña).
+// Frontend: Recibe los datos del usuario y actualiza el auth.store.
+
+
+
 // Tipo para los datos de registro
 export type UserRegistrationData = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
 export type UserLoginData = Omit<UserRegistrationData, 'name'>;

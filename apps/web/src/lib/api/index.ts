@@ -40,11 +40,18 @@ export async function apiClient<T>(
     }
   }
 
+  console.log(`Llamada a la API: ${method} ${PUBLIC_API_URL}${endpoint}`, {
+    headers: finalHeaders,
+    body
+  });
+
   const response = await fetch(`${PUBLIC_API_URL}${endpoint}`, {
     method,
     headers: finalHeaders,
     body: body ? JSON.stringify(body) : null
   });
+
+  console.log(`Respuesta de la API: ${response.status} ${response.statusText}`);
 
   if (!response.ok) {
     // Manejo de errores de la API
