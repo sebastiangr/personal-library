@@ -3,6 +3,7 @@
 	import favicon from '$lib/assets/favicon.svg';
   import { authStore } from '$lib/stores/auth.svelte';
   import type { LayoutData } from './$types';
+  import Navbar from '$lib/components/layout/Navbar.svelte'; // <-- Importa el Navbar
   
   let { data, children } = $props<{ data: LayoutData }>();
   // let { data } = $props<{ data: LayoutData }>();
@@ -17,5 +18,9 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{@render children?.()}
+<Navbar />
+
+<main>
+  {@render children?.()}
+</main>
 
