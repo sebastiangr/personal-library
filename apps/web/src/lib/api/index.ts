@@ -1,13 +1,7 @@
 // apps/web/src/lib/api/index.ts
 import { PUBLIC_API_URL } from '$env/static/public';
 
-// Función auxiliar para obtener el token desde localStorage 
-function getAuthToken(): string | null {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('authToken');
-  }
-  return null;
-}
+
 
 type ApiClientOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -29,16 +23,7 @@ export async function apiClient<T>(
     ...headers
   };
   
-  if (needsAuth) {
-    const token = serverToken || getAuthToken();
-    if (token) {
-      finalHeaders['Authorization'] = `Bearer ${token}`;
-    } else {
-      // Si una ruta requiere auth y no hay token, podemos lanzar un error
-      // o manejarlo de otra forma, como una redirección.
-      console.warn(`Petición a ${endpoint} requiere autenticación pero no se encontró token.`);
-    }
-  }
+  // No enviar Authorization por defecto, confiar en cookie httpOnly
 
   console.log(`Llamada a la API: ${method} ${PUBLIC_API_URL}${endpoint}`, {
     headers: finalHeaders,

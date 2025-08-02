@@ -6,7 +6,7 @@ import type { RequestHandler } from './$types';
 
 // Manejador para POST /api/books
 export const POST: RequestHandler = async ({ request, cookies }) => {
-  const token = cookies.get('authToken');
+  // Eliminado: obtención de token desde cookies, ahora lo maneja Express backend
   const bookData = await request.json();
 
   try {
@@ -14,7 +14,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     const newBook = await apiClient<Book>('/books', {
       method: 'POST',
       body: bookData,
-    }, token); // <-- Pasamos el token aquí
+    });
     
     return json(newBook, { status: 201 });
   } catch (error: any) {

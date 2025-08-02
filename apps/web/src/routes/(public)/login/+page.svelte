@@ -15,40 +15,42 @@
     isLoading = true;
 
     try {
-
+      // 1. Login: obtener token
       const response = await fetch('/api/auth/login', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
 
+      // if (!response.ok) {
+      //   const errorData = await response.json();
+      //   throw new Error(errorData.message || 'Error al iniciar sesión');
+      // }
+
+      const data = await response.json();
+      console.log('Login response (desde el login):', data);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al iniciar sesión');
+        throw new Error(data.message || 'Error al iniciar sesión');
+      };
+
+
+      // 2. Obtener perfil de usuario (la cookie httpOnly ya está seteada por el backend)
+      const userRes = await fetch('/api/profile', {
+        method: 'GET',
+        credentials: 'include'
+      });
+      console.log('Respuesta del perfil de usuario (desde el login):', userRes);
+      if (!userRes.ok) {
+        throw new Error('No se pudo obtener el perfil de usuario (desde el login)');
       }
+      const user = await userRes.json();
 
-      await invalidateAll()
+      // 3. Actualizar authStore (no guardamos token en frontend)
+      authStore.set({ user });
+
+      await invalidateAll();
       goto('/dashboard');
-
-
-      //2. Update UI and return, invalidateAll 
-
-      // const { token } = await apiClient<{ token: string }>('/auth/login', {
-      //   method: 'POST',
-      //   body: { email, password },
-      //   needsAuth: false // Esta ruta no necesita token
-      // });
-      
-      // // Aquí deberíamos obtener los datos del usuario.
-      // // Por ahora, asumimos que los tenemos o hacemos otra llamada.
-      // // Una mejora sería que el endpoint de login devuelva el user y el token.
-      // // Vamos a simularlo por ahora.
-      // const userPayload = JSON.parse(atob(token.split('.')[1])).user;
-      
-      // authStore.login(userPayload, token);
-      
-      // // Redirige al dashboard después del login
-      // goto('/dashboard');
-
     } catch (e: any) {
       error = e.message;
     } finally {

@@ -43,7 +43,8 @@ export const registerUser = async (data: UserRegistrationData): Promise<User> =>
   return userWithoutPassword as User;
 };
 
-export const loginUser = async (credentials: UserLoginData): Promise<{ token: string; user: Omit<User, 'password_hash'>; }> => {
+// export const loginUser = async (credentials: UserLoginData): Promise<{ token: string; user: Omit<User, 'password_hash'>; }> => {
+export const loginUser = async (credentials: UserLoginData): Promise<{ token: string; }> => {
   const { email, password_hash: plainPassword } = credentials;
 
   // 1. Buscar al usuario por email
@@ -79,7 +80,8 @@ export const loginUser = async (credentials: UserLoginData): Promise<{ token: st
 
   const token = jwt.sign(payload, secret, { expiresIn: '1d' }); // El token expira en 1 día
 
-  const { password_hash, ...userWithoutPassword } = user;
+  // const { password_hash, ...userWithoutPassword } = user;
 
-  return { token, user: userWithoutPassword }
+  // return { token, user: userWithoutPassword }
+  return { token };
 };

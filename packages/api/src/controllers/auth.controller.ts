@@ -20,8 +20,16 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
-    const { token, user } = await authService.loginUser({ email, password_hash: password });
-    res.status(200).json({ token, user });
+    const { token } = await authService.loginUser({ email, password_hash: password });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24 // 1 día
+    });
+    console.log(`Token de sesión establecido para el usuario ${email}`);
+    // res.status(200).json({ token });
+    res.status(200).json({ success: true });
   } catch (error: any) {
     res.status(401).json({ message: error.message }); // 401 Unauthorized
   }

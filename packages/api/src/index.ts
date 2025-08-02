@@ -26,6 +26,7 @@ console.log("Importado cors");
 import { appTest } from './app';
 
 import authRoutes from './routes/auth.routes'; // Import auth routes
+import profileRoutes from './routes/profile.routes';
 console.log("Importado authRoutes");
 import bookRoutes from './routes/book.routes'; // Import book routes
 console.log("Importado bookRoutes");
@@ -47,7 +48,10 @@ const PORT = Number(process.env.PORT) || 3003;
 console.log(`Puerto configurado: ${PORT}`);
 
 // Middlewares
-app.use(cors()); // Enables CORS for all routes
+app.use(cors({
+  origin: 'http://localhost:5173', // o el dominio de tu frontend
+  credentials: true
+})); // Enables CORS for all routes
 app.use(express.json()); // Enable JSON parsing for incoming requests
 console.log("Middlewares configurados: CORS y JSON parsing");
 
@@ -64,12 +68,14 @@ app.get('/', (req: Request, res: Response) => {
   `);
 });
 
+
 app.use('/api/auth', authRoutes); // Use auth routes under /api/auth
 app.use('/api/books', bookRoutes); // Use book routes under /api/books
 app.use('/api/loans', loanRoutes); // Use loan routes under /api/loans
 app.use('/api/authors', authorRoutes); // Use author routes under /api/authors
 app.use('/api/publishers', publisherRoutes); // Use publisher routes under /api/publishers
 app.use('/api/genres', genresRoutes); // Use genre routes under /api/genres
+app.use('/api/profile', profileRoutes); // Endpoint de perfil de usuario autenticado
 
 
 

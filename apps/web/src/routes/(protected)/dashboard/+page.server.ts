@@ -5,11 +5,11 @@ import type { PageServerLoad } from './$types';
 // La función `load` se ejecuta en el servidor antes de renderizar la página.
 export const load: PageServerLoad = async ({ cookies }) => {
   // 1. Obtenemos el token de la cookie segura.
-  const token = cookies.get('authToken');
+  // Eliminado: obtención de token desde cookies, ahora lo maneja Express backend
   
   try {
     // 2. Llamamos a nuestra API del backend para obtener los libros.
-    const books = await apiClient<Book[]>('/books', {}, token);
+    const books = await apiClient<Book[]>('/books');
     
     // 3. Devolvemos los libros para que la página los pueda usar.
     return { books };

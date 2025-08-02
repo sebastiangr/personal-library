@@ -14,8 +14,17 @@ declare global {
 }
 
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction): void => {
+  // 1. Buscar token en header Authorization
+  let token: string | undefined;
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Formato "Bearer TOKEN"
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  }
+
+  // 2. Si no está en header, buscar en cookies
+  if (!token && req.cookies && req.cookies.token) {
+    token = req.cookies.token;
+  }
 
   if (!token) {
     res.status(401).json({ message: 'Acceso denegado. No se proporcionó token.' });
@@ -25,21 +34,15 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
   try {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
-      // Este es un error del servidor, no del cliente.
       console.error('La clave secreta de JWT no está configurada.');
       res.status(500).json({ message: 'Error interno del servidor.' });
       return;
     }
 
     const decodedPayload = jwt.verify(token, secret);
-
-    // Añadimos el payload del usuario a la request.
-    // TypeScript ahora sabe que 'req.user' es una propiedad válida.
-    req.user = (decodedPayload as any).user; 
-    
+    req.user = (decodedPayload as any).user;
     next();
   } catch (error) {
-    // 403 Forbidden
     res.status(403).json({ message: 'Token no válido o expirado.' });
   }
 };

@@ -4,10 +4,10 @@ import type { Genre } from '$lib/types';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ cookies }) => {
-  const token = cookies.get('authToken');
+  // Eliminado: obtención de token desde cookies, ahora lo maneja Express backend
   
   try {
-    const genres = await apiClient<Genre[]>('/genres', {}, token);
+    const genres = await apiClient<Genre[]>('/genres');
     return json(genres);
   } catch (error: any) {
     return json({ message: error.message }, { status: 500 });

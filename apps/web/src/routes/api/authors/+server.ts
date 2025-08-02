@@ -4,10 +4,10 @@ import type { Author } from '$lib/types';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ cookies }) => {
-  const token = cookies.get('authToken');
+  // Eliminado: obtención de token desde cookies, ahora lo maneja Express backend
   
   try {
-    const authors = await apiClient<Author[]>('/authors', {}, token);
+    const authors = await apiClient<Author[]>('/authors');
     return json(authors);
   } catch (error: any) {
     return json({ message: error.message }, { status: 500 });

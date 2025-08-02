@@ -10,7 +10,7 @@
   let error = $state<string | null>(null);
 
   async function handleCreateBook(bookData: Partial<Book>) {
-    // FIXME: bookData come here undefined.
+    
     console.log('Handling book creation with data:', bookData);
     isLoading = true;
     error = null;

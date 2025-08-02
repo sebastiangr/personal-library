@@ -2,7 +2,7 @@ import { apiClient } from '$lib/api';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
-  const token = cookies.get('authToken');
+  // Eliminado: obtención de token desde cookies, ahora lo maneja Express backend
   const bookId = params.id;
   
   // const book = await apiClient(`/books/${bookId}`, {
@@ -12,6 +12,6 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
   //     // Por ahora, asumiremos que apiClient puede funcionar si le pasamos el token.
   //     // Tendremos que refactorizar apiClient para esto.
   // });
-  const book = await apiClient(`/books/${bookId}`, {}, token);
+  const book = await apiClient(`/books/${bookId}`);
   return { book };
 };

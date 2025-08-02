@@ -1,21 +1,24 @@
 import type { Session, User } from '$lib/types';
 
+
 function createAuthStore() {
-  let session = $state<Session>({
-    user: null,
-    token: null,
+  let session = $state<{ user: User | null }>({
+    user: null
   });
 
-  function set(newSession: Session) {
+
+  function set(newSession: { user: User | null }) {
     session = newSession;
   }
 
   // Logout function clears cookies
+
   async function logout() {
-    session = { user: null, token: null };
+    session = { user: null };
     // TODO: Clear cookies in the backend
     await fetch('/api/auth/logout', { method: 'POST' });
   }
+
 
   return {
     get session() {
@@ -37,12 +40,7 @@ export const authStore = createAuthStore();
 
 // // Al iniciar la app en el navegador, intenta cargar los datos de sesión
 // if (browser) {
-//   const storedToken = localStorage.getItem('authToken');
-//   const storedUser = localStorage.getItem('user');
-//   if (storedToken && storedUser) {
-//     token = storedToken;
-//     user = JSON.parse(storedUser);
-//   }
+//   // Eliminado: manejo de authToken en localStorage
 // }
 
 // // Objeto exportado con el estado y las funciones para manipularlo
@@ -50,21 +48,13 @@ export const authStore = createAuthStore();
 //   get user() { return user; },
 //   get token() { return token; },
   
-//   login: (userData: { id: string, email: string }, authToken: string) => {
+//   login: (userData: { id: string, email: string }) => {
 //     user = userData;
-//     token = authToken;
-//     if (browser) {
-//       localStorage.setItem('authToken', authToken);
-//       localStorage.setItem('user', JSON.stringify(userData));
-//     }
+//     token = null;
 //   },
   
 //   logout: () => {
 //     user = null;
 //     token = null;
-//     if (browser) {
-//       localStorage.removeItem('authToken');
-//       localStorage.removeItem('user');
-//     }
 //   }
 // };
