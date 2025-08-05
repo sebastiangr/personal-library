@@ -51,6 +51,7 @@ describe('Auth Endpoints', () => {
     expect(response.statusCode).toBe(409); // 409 Conflict
   });
   
+  // FIXME: Look for the JWT Token in the header?
   it('Should log in a registered user and return a JWT token', async () => {
     // Arrange: registrar al usuario
     await request(app)
@@ -62,10 +63,18 @@ describe('Auth Endpoints', () => {
       .post('/api/auth/login')
       .send({ email: 'login@example.com', password: 'password123' });
       
+
     // Assert: comprobar la respuesta
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty('token');
-    expect(typeof response.body.token).toBe('string');
+
+    expect(response.headers['set-cookie']).toBeDefined();      
+    const cookieString = response.headers['set-cookie'][0];
+    expect(cookieString).toMatch(/token=/);
+    expect(cookieString).toMatch(/HttpOnly/);
+
+    // FIXME: Verify the user data
+    // expect(response.body.user).toBeDefined();
+    //expect(response.body.user.email).toBe('login@example.com');
   });
 
   it('Should not log in with incorrect credentials', async () => {

@@ -2,7 +2,7 @@ import request from 'supertest';
 import { appTest as app } from '../app';
 import { prisma } from '../prisma/client';
 
-let token: string;
+const agent = request.agent(app);
 let userId: string;
 
 // --- SETUP & TEARDOWN ---
@@ -16,16 +16,16 @@ beforeAll(async () => {
   await prisma.user.deleteMany({}); 
 
   // Create a user and get its token
-  const userResponse = await request(app)
+  const userResponse = await agent
     .post('/api/auth/register')
     .send({ email: 'book-test-user@example.com', password: 'password123' });
   userId = userResponse.body.id;
 
   // Log in to get the token
-  const loginResponse = await request(app)
+  const loginResponse = await agent
     .post('/api/auth/login')
     .send({ email: 'book-test-user@example.com', password: 'password123' });
-  token = loginResponse.body.token;
+  expect(loginResponse.statusCode).toBe(200);  
 });
 
 // 2. Before each test, clean the books table to avoid interference
@@ -42,16 +42,14 @@ afterAll(async () => {
 // --- TEST SUITE for Genres ---
 describe('Genre Endpoints', () => {
 
-
   it('Should not allow access without a token', async () => {
     const response = await request(app).get('/api/authors');
     expect(response.statusCode).toBe(401); // Unauthorized
   });
 
   it('Should create a new genre successfully', async () => {
-    const response = await request(app)
+    const response = await agent
       .post('/api/genres')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Fantasy',
         description: 'A genre of speculative fiction set in a fictional universe.',
@@ -64,17 +62,15 @@ describe('Genre Endpoints', () => {
   });
 
   it('Should fetch all genres for the authenticated user', async () => {
-    await request(app)
+    await agent
       .post('/api/genres')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Science Fiction',
         description: 'A genre that deals with imaginative and futuristic concepts.',
       });
 
-    const response = await request(app)
-      .get('/api/genres')
-      .set('Authorization', `Bearer ${token}`);
+    const response = await agent
+      .get('/api/genres');
 
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBeGreaterThan(0);
@@ -84,9 +80,8 @@ describe('Genre Endpoints', () => {
   });
 
   it('Should fetch a genre by ID', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/genres')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Mystery',
         description: 'A genre that involves solving a crime or uncovering secrets.',
@@ -94,9 +89,8 @@ describe('Genre Endpoints', () => {
 
     const genreId = createResponse.body.id;
 
-    const response = await request(app)
-      .get(`/api/genres/${genreId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const response = await agent
+      .get(`/api/genres/${genreId}`);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty('id', genreId);
@@ -105,17 +99,15 @@ describe('Genre Endpoints', () => {
 
   it('Should return 404 if fetching a genre that does not exist', async () => {
     const nonExistentId = '00000000-0000-0000-0000-000000000000';
-    const response = await request(app)
-      .get(`/api/genres/${nonExistentId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const response = await agent
+      .get(`/api/genres/${nonExistentId}`);
 
     expect(response.statusCode).toBe(404);
   });
 
   it('Should update a genre successfully', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/genres')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Horror',
         description: 'A genre intended to frighten, scare, or disgust.',
@@ -123,9 +115,8 @@ describe('Genre Endpoints', () => {
 
     const genreId = createResponse.body.id;
 
-    const response = await request(app)
+    const response = await agent
       .put(`/api/genres/${genreId}`)
-      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Psychological Horror',
         description: 'A subgenre that focuses on the psychological states of characters.',
@@ -137,9 +128,8 @@ describe('Genre Endpoints', () => {
   });
 
   it('Should delete a genre successfully', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/genres')
-      .set('Authorization', `Bearer ${token}`)
       .send({ 
         name: 'Romance', 
         description: 'A genre focused on romantic relationships.' 
@@ -147,9 +137,8 @@ describe('Genre Endpoints', () => {
 
     const genreId = createResponse.body.id;
 
-    const deleteResponse = await request(app)
-      .delete(`/api/genres/${genreId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const deleteResponse = await agent
+      .delete(`/api/genres/${genreId}`);
 
     expect(deleteResponse.statusCode).toBe(200);
     expect(deleteResponse.body).toHaveProperty('message', `Genre with ID ${genreId} deleted successfully.`);

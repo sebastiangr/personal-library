@@ -2,7 +2,7 @@ import request from 'supertest';
 import { appTest as app } from '../app'; // Importamos la app de Express para los tests
 import { prisma } from '../prisma/client';
 
-let token: string;
+const agent = request.agent(app);
 let userId: string;
 
 // --- SETUP & TEARDOWN ---
@@ -17,17 +17,18 @@ beforeAll(async () => {
   await prisma.user.deleteMany({});  
   
   // Create a user and get its token
-  const userResponse = await request(app)
+  const userResponse = await agent
     .post('/api/auth/register')
     .send({ email: 'book-test-user@example.com', password: 'password123' });
   userId = userResponse.body.id;
 
   // Log in to get the token
-  const loginResponse = await request(app)
+  const loginResponse = await agent
     .post('/api/auth/login')
     .send({ email: 'book-test-user@example.com', password: 'password123' });
-  token = loginResponse.body.token;
-  console.log('Token obtenido:', token);
+  // token = loginResponse.body.token;
+  expect(loginResponse.statusCode).toBe(200);
+  // console.log('Token obtenido:', token);
 });
 
 // 2. Before each test, clean the books table to avoid interference
@@ -51,9 +52,8 @@ describe('Book Endpoints', () => {
   });
 
   it('Should create a new book successfully', async () => {
-    const response = await request(app)
+    const response = await agent
       .post('/api/books')
-      .set('Authorization', `Bearer ${token}`) // <-- Autenticación
       .send({
         title: 'The Hobbit',
         published_year: 1937,
@@ -66,9 +66,8 @@ describe('Book Endpoints', () => {
   });
 
   it('Should fail to create a book without a title (validation)', async () => {
-    const response = await request(app)
+    const response = await agent
       .post('/api/books')
-      .set('Authorization', `Bearer ${token}`)
       .send({ published_year: 1937 }); // Sin título
       
     expect(response.statusCode).toBe(400); // Bad Request por Zod
@@ -76,15 +75,13 @@ describe('Book Endpoints', () => {
 
   it('Should fetch all books for the authenticated user', async () => {
     // Arrange: Crea un libro primero
-    await request(app)
+    await agent
       .post('/api/books')
-      .set('Authorization', `Bearer ${token}`)
       .send({ title: 'Book 1' });
     
     // Act: Pide la lista de libros
-    const response = await request(app)
-      .get('/api/books')
-      .set('Authorization', `Bearer ${token}`);
+    const response = await agent
+      .get('/api/books');
       
     // Assert
     expect(response.statusCode).toBe(200);
@@ -94,15 +91,13 @@ describe('Book Endpoints', () => {
   });
 
   it('Should fetch a single book by its ID', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/books')
-      .set('Authorization', `Bearer ${token}`)
       .send({ title: 'Fetch Me' });
     const bookId = createResponse.body.id;
 
-    const response = await request(app)
-      .get(`/api/books/${bookId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const response = await agent
+      .get(`/api/books/${bookId}`);
       
     expect(response.statusCode).toBe(200);
     expect(response.body.title).toBe('Fetch Me');
@@ -110,23 +105,20 @@ describe('Book Endpoints', () => {
   
   it('Should return 404 if fetching a book that does not exist', async () => {
     const nonExistentId = '00000000-0000-0000-0000-000000000000';
-    const response = await request(app)
-      .get(`/api/books/${nonExistentId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const response = await agent
+      .get(`/api/books/${nonExistentId}`);
       
     expect(response.statusCode).toBe(404);
   });
 
   it('Should update a book successfully', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/books')
-      .set('Authorization', `Bearer ${token}`)
       .send({ title: 'To Be Updated' });
     const bookId = createResponse.body.id;
 
-    const response = await request(app)
+    const response = await agent
       .put(`/api/books/${bookId}`)
-      .set('Authorization', `Bearer ${token}`)
       .send({ title: 'Updated Title' });
 
     expect(response.statusCode).toBe(200);
@@ -134,22 +126,19 @@ describe('Book Endpoints', () => {
   });
   
   it('Should delete a book successfully', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/books')
-      .set('Authorization', `Bearer ${token}`)
       .send({ title: 'To Be Deleted' });
     const bookId = createResponse.body.id;
 
-    const deleteResponse = await request(app)
-      .delete(`/api/books/${bookId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const deleteResponse = await agent
+      .delete(`/api/books/${bookId}`);
     
     expect(deleteResponse.statusCode).toBe(204);
 
     // Opcional: Verificar que el libro ya no está en la DB
-    const findResponse = await request(app)
-      .get(`/api/books/${bookId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const findResponse = await agent
+      .get(`/api/books/${bookId}`);
     expect(findResponse.statusCode).toBe(404);
   });
 

@@ -5,8 +5,25 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-export const prisma = global.prisma || new PrismaClient();
+let prisma: PrismaClient;
 
-if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prisma;
+const getPrismaClient = () => {
+  if (process.env.NODE_ENV === 'production') {
+    return new PrismaClient();
+  } else {
+    if (!global.prisma) {
+      global.prisma = new PrismaClient();
+    }
+    return global.prisma;    
+  }
 }
+
+prisma = getPrismaClient();
+
+export { prisma };
+
+// export const prisma = global.prisma || new PrismaClient();
+
+// if (process.env.NODE_ENV !== 'production') {
+//   global.prisma = prisma;
+// }

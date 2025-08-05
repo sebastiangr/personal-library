@@ -2,10 +2,12 @@ import request from 'supertest';
 import { appTest as app } from '../app';
 import { prisma } from '../prisma/client';
 
+const agent = request.agent(app);
 let ownerToken: string, borrowerToken: string;
 let ownerId: string, borrowerId: string;
 let bookId: string;
 
+// TODO: Finish new implementation of this test.
 // --- SETUP & TEARDOWN ---
 // 1. Before all tests, create users and get their tokens
 beforeAll(async () => {

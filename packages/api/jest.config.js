@@ -6,6 +6,6 @@ module.exports = {
   verbose: true,
   forceExit: true, // Fuerza la salida después de los tests, útil para evitar procesos colgados
   clearMocks: true, // Limpia los mocks entre tests
-  setupFiles: ['dotenv/config'],
-  // setupFiles: ['./jest.setup.js'],
+  // setupFiles: ['dotenv/config'],
+  setupFiles: ['./jest.setup.js'],
 };

@@ -2,7 +2,7 @@ import request from 'supertest';
 import { appTest as app } from '../app';
 import { prisma } from '../prisma/client';
 
-let token: string;
+const agent = request.agent(app);
 let userId: string;
 
 // --- SETUP & TEARDOWN ---
@@ -12,16 +12,16 @@ beforeAll(async () => {
   await prisma.user.deleteMany({});
 
   // Create a user and get its token
-  const userResponse = await request(app)
+  const userResponse = await agent
     .post('/api/auth/register')
     .send({ email: 'book-test-user@example.com', password: 'password123' });
   userId = userResponse.body.id;
 
   // Log in to get the token
-  const loginResponse = await request(app)
+  const loginResponse = await agent
     .post('/api/auth/login')
     .send({ email: 'book-test-user@example.com', password: 'password123' });
-  token = loginResponse.body.token;
+  expect(loginResponse.statusCode).toBe(200);
 });
 
 // 2. Before each test, clean the books table to avoid interference
@@ -50,9 +50,8 @@ describe('Author Endpoints', () => {
   });
    
   it('Should create a new author successfully', async () => {
-    const response = await request(app)
+    const response = await agent
       .post('/api/authors')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'J.R.R. Tolkien',
         bio: 'Author of The Hobbit and The Lord of the Rings',
@@ -65,14 +64,12 @@ describe('Author Endpoints', () => {
   });
 
   it('Should fetch all authors for the authenticated user', async () => {
-    await request(app)
+    await agent
       .post('/api/authors')
-      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'George Orwell', bio: 'Author of 1984 and Animal Farm' });
 
-    const response = await request(app)
-      .get('/api/authors')
-      .set('Authorization', `Bearer ${token}`);
+    const response = await agent
+      .get('/api/authors');
 
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBeGreaterThan(0);
@@ -80,16 +77,14 @@ describe('Author Endpoints', () => {
   });
 
   it('Should fetch a single author by ID', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/authors')
-      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'Isaac Asimov', bio: 'Author of Foundation series' });
     
     const authorId = createResponse.body.id;
 
-    const response = await request(app)
-      .get(`/api/authors/${authorId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const response = await agent
+      .get(`/api/authors/${authorId}`);
 
     expect(response.statusCode).toBe(200);
     expect(response.body.name).toBe('Isaac Asimov');
@@ -97,24 +92,21 @@ describe('Author Endpoints', () => {
 
   it('Should return 404 if fetching an author that does not exist', async () => {
     const nonExistentId = '00000000-0000-0000-0000-000000000000';
-    const response = await request(app)
-      .get(`/api/authors/${nonExistentId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const response = await agent
+      .get(`/api/authors/${nonExistentId}`);
 
     expect(response.statusCode).toBe(404);
   });1
 
   it('Should update an author successfully', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/authors')
-      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'Arthur C. Clarke', bio: 'Author of 2001: A Space Odyssey' });
     
     const authorId = createResponse.body.id;
 
-    const response = await request(app)
+    const response = await agent
       .put(`/api/authors/${authorId}`)
-      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'Arthur C. Clarke', bio: 'Updated bio' });
 
     expect(response.statusCode).toBe(200);
@@ -123,17 +115,15 @@ describe('Author Endpoints', () => {
   });
 
   it('Should delete an author successfully', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/authors')
-      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'George Orwell', bio: 'Author of 1986' });
 
     const authorId = createResponse.body.id;
     const authorName = createResponse.body.name;
 
-    const deleteResponse = await request(app)
-      .delete(`/api/authors/${authorId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const deleteResponse = await agent
+      .delete(`/api/authors/${authorId}`);
 
     expect(deleteResponse.statusCode).toBe(200);      
     expect(deleteResponse.body).toHaveProperty('message', `Author ${authorName} deleted successfully.`);

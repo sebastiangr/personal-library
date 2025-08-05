@@ -2,6 +2,7 @@ import  request from 'supertest';
 import { appTest as app } from '../app';
 import { prisma } from '../prisma/client';
 
+const agent = request.agent(app);
 let token: string;
 let userId: string;
 
@@ -16,16 +17,16 @@ beforeAll(async () => {
   await prisma.user.deleteMany({});
 
   // Create a user and get its token
-  const userResponse = await request(app)
+  const userResponse = await agent
     .post('/api/auth/register')
     .send({ email: 'book-test-user@example.com', password: 'password123' });
   userId = userResponse.body.id;
 
   // Log in to get the token
-  const loginResponse = await request(app)
+  const loginResponse = await agent
     .post('/api/auth/login')
     .send({ email: 'book-test-user@example.com', password: 'password123' });
-  token = loginResponse.body.token;
+  expect(loginResponse.statusCode).toBe(200);
 });
 
 // 2. Before each test, clean the authors table to avoid interference
@@ -48,9 +49,8 @@ describe('Publisher Endpoints', () => {
   });
 
   it('Should create a new publisher successfully', async () => {
-    const response = await request(app)
+    const response = await agent
       .post('/api/publishers')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Penguin Random House',
         country: 'USA',
@@ -65,18 +65,16 @@ describe('Publisher Endpoints', () => {
   });
 
   it('Should fetch all publishers for the authenticated user', async () => {
-    await request(app)
+    await agent
       .post('/api/publishers')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Penguin Random House',
         country: 'USA',
         city: 'New York',
       });
 
-    const response = await request(app)
-      .get('/api/publishers')
-      .set('Authorization', `Bearer ${token}`);      
+    const response = await agent
+      .get('/api/publishers');      
 
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBeGreaterThan(0);
@@ -88,9 +86,8 @@ describe('Publisher Endpoints', () => {
   });
 
   it('Should fetch a publisher by ID', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/publishers')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'HarperCollins',
         country: 'USA',
@@ -99,9 +96,8 @@ describe('Publisher Endpoints', () => {
 
     const publisherId = createResponse.body.id;
 
-    const response = await request(app)
-      .get(`/api/publishers/${publisherId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const response = await agent
+      .get(`/api/publishers/${publisherId}`);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty('id', publisherId);
@@ -110,17 +106,15 @@ describe('Publisher Endpoints', () => {
 
   it('Should return 404 if fetching a publisher that does not exist', async () => {
     const nonExistentId = '00000000-0000-0000-0000-000000000000';
-    const response = await request(app)
-      .get(`/api/publishers/${nonExistentId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const response = await agent
+      .get(`/api/publishers/${nonExistentId}`);
 
     expect(response.statusCode).toBe(404);
   });
 
   it('Should update a publisher successfully', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/publishers')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Macmillan',
         country: 'USA',
@@ -129,9 +123,8 @@ describe('Publisher Endpoints', () => {
 
     const publisherId = createResponse.body.id;
 
-    const response = await request(app)
+    const response = await agent
       .put(`/api/publishers/${publisherId}`)
-      .set('Authorization', `Bearer ${token}`)
       .send({ name: 'Macmillan Updated' });
 
     expect(response.statusCode).toBe(200);
@@ -139,9 +132,8 @@ describe('Publisher Endpoints', () => {
   });
 
   it('Should delete a publisher successfully', async () => {
-    const createResponse = await request(app)
+    const createResponse = await agent
       .post('/api/publishers')
-      .set('Authorization', `Bearer ${token}`)
       .send({
         name: 'Simon & Schuster',
         country: 'USA',
@@ -150,9 +142,8 @@ describe('Publisher Endpoints', () => {
 
     const publisherId = createResponse.body.id;
 
-    const deleteResponse = await request(app)
-      .delete(`/api/publishers/${publisherId}`)
-      .set('Authorization', `Bearer ${token}`);
+    const deleteResponse = await agent
+      .delete(`/api/publishers/${publisherId}`);
 
     expect(deleteResponse.statusCode).toBe(200);
     expect(deleteResponse.body).toHaveProperty('message', `Publisher ${createResponse.body.name} deleted successfully.`);
