@@ -1,5 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 
+if (process.env.NODE_ENV === 'test' && !process.env.DATABASE_URL?.includes('test')) {
+  throw new Error(
+    '¡PELIGRO! Intento de ejecutar tests en una base de datos que no es de prueba. Revisa tu configuración de .env.'
+  );
+}
+
 declare global {
   // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;

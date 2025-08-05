@@ -1,0 +1,4 @@
+# packages/api/bunfig.toml
+
+[test]
+preload = ["./bun.test.setup.ts"]
