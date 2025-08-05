@@ -1,16 +1,17 @@
+import { apiClient } from '$lib/api';
 import type { Author } from '$lib/types';
 import type { PageServerLoad } from './$types';
 
-// La función `load` se ejecuta en el servidor.
-// `fetch` aquí es una versión especial proporcionada por SvelteKit
-// que puede llamar a tus propios endpoints de API internos.
-export const load: PageServerLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async ({ cookies }) => {
+  const token = cookies.get('token');
+  console.log('Token from authors>page.server.ts: ', token);
+
+  if (!token) {
+    return { authors: [] };
+  }
+
   try {
-    const response = await fetch('/api/authors');
-    if (!response.ok) {
-        throw new Error('Failed to fetch authors');
-    }
-    const authors: Author[] = await response.json();
+    const authors = await apiClient<Author[]>('/authors', {}, token);
     return { authors };
   } catch (error) {
     console.error("Error fetching authors:", error);

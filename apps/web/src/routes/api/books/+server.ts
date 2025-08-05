@@ -1,4 +1,3 @@
-// apps/web/src/routes/api/books/+server.ts
 import { json } from '@sveltejs/kit';
 import { apiClient } from '$lib/api';
 import type { Book } from '$lib/types';

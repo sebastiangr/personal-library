@@ -1,14 +1,18 @@
+import { apiClient } from '$lib/api';
 import type { Genre } from '$lib/types';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async ({ cookies }) => {
+  const token = cookies.get('token');
+  console.log('Token from authors>page.server.ts: ', token);
+
+  if (!token) {
+    return { genres: [] };
+  }
+
   try {
-    const response = await fetch('/api/genres');
-    if (!response.ok) {
-        throw new Error('Failed to fetch genres');
-    }
-    const genres: Genre[] = await response.json();
-    return { genres };
+    const genres = await apiClient<Genre[]>('/genres', {}, token);
+    return { genres };  
   } catch (error) {
     console.error("Error fetching genres:", error);
     return { genres: [] };
