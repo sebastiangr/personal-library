@@ -10,6 +10,7 @@ let userId: string;
 // 1. Before all tests, create a user and get its token
 beforeAll(async () => {
   // Clean the database before tests
+  await prisma.loan.deleteMany({});      // Los préstamos dependen de Libros y Usuarios
   await prisma.book.deleteMany({});      // Los libros dependen de Autores, Géneros, Publishers y Usuarios
   await prisma.author.deleteMany({});    // Entidades principales
   await prisma.genre.deleteMany({});

@@ -26,6 +26,7 @@ export const loanBook = async (bookId: string, ownerId: string, borrowerId: stri
         ownerId: ownerId,
         borrowerId: borrowerId,
         expectedReturnDate: expectedReturnDate,
+        actualReturnDate: null,
       },
     });
 

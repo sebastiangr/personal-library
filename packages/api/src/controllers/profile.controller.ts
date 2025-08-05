@@ -15,7 +15,7 @@ export const getProfile = async (req: Request, res: Response) => {
       where: { id: userId },
       select: { id: true, email: true, name: true, createdAt: true }
     });
-    console.log(`<profile.controller.ts> User: ${user}`);
+    console.log(`<profile.controller.ts> User: ${user?.name}`);
     
     if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
