@@ -1,8 +1,6 @@
 // apps/web/src/lib/api/index.ts
 import { PUBLIC_API_URL } from '$env/static/public';
 
-
-
 type ApiClientOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: Record<string, any>;
@@ -22,6 +20,20 @@ export async function apiClient<T>(
     'Content-Type': 'application/json',
     ...headers
   };
+  
+  
+  if (needsAuth) {
+    const token = serverToken;
+    console.log('Token from API:index.ts: ', token);
+    
+    if (token) {
+      finalHeaders['Authorization'] = `Bearer ${token}`;
+    } else {
+      // Este es el error que probablemente estás viendo en la consola
+      console.warn(`Petición a ${endpoint} requiere autenticación pero no se encontró token.`);
+      throw new Error('Authentication token is missing.');
+    }
+  }
   
   // No enviar Authorization por defecto, confiar en cookie httpOnly
 

@@ -32,7 +32,14 @@
   <h1 class="text-3xl font-bold mb-6">Mi Biblioteca</h1>
 
   {#if authStore.session.user}
-    <p class="mb-4">Bienvenido, {authStore.session.user.email}!</p>
+    <p class="mb-4">Bienvenido, {authStore.session.user.name} ({authStore.session.user.email})</p>
+
+    <p>Información usuario: </p>
+    <pre class="bg-gray-100 p-4 rounded-lg">
+      {JSON.stringify(authStore.session.user, null, 2)}
+    </pre>
+    <p>{authStore.session.user.name}</p>
+
   {/if}
 
   {#if data.books && data.books.length === 0}
