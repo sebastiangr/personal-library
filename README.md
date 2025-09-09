@@ -6,7 +6,7 @@ This project is structured as a **pnpm monorepo**, containing the backend API, a
 
 ---
 
-## 🚀 Core Features
+## Core Features
 
 -   **Backend API**: A robust Node.js API to handle all data and business logic.
 -   **Web Application**: A responsive and user-friendly SvelteKit frontend.
@@ -16,7 +16,7 @@ This project is structured as a **pnpm monorepo**, containing the backend API, a
 
 ---
 
-## 📂 Monorepo Structure
+## Monorepo Structure
 
 The project is organized into two main directories:
 
@@ -28,7 +28,7 @@ The project is organized into two main directories:
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 -   **Monorepo Management**: `pnpm` workspaces
 -   **Backend**: Node.js, Express.js, TypeScript
@@ -40,7 +40,7 @@ The project is organized into two main directories:
 
 ---
 
-## 🏁 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -53,7 +53,7 @@ The project is organized into two main directories:
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/<your-username>/personal-library.git
+    git clone https://github.com/sebastiangr/personal-library.git
     cd personal-library
     ```
 
