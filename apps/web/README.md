@@ -2,7 +2,7 @@
 
 This is the frontend for the Personal Library application, built with SvelteKit and Tailwind CSS. It provides a user-friendly interface to interact with the backend API, allowing users to manage their personal book collection, loans, and more.
 
-## ✨ Features
+## Features
 
 - **Authentication**: Secure user login and registration.
 - **Dashboard**: A central hub to view your library at a glance.
@@ -11,7 +11,7 @@ This is the frontend for the Personal Library application, built with SvelteKit 
 - **Loan System**: Track books you've lent to friends and books you've borrowed.
 - **Responsive Design**: A clean and modern UI that works on all screen sizes, powered by Tailwind CSS.
 
-## 🛠️ Technologies Used
+##  Technologies Used
 
 - **Framework**: SvelteKit
 - **UI**: Svelte 5
@@ -19,7 +19,7 @@ This is the frontend for the Personal Library application, built with SvelteKit 
 - **Styling**: Tailwind CSS
 - **Package Manager**: pnpm
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -55,7 +55,7 @@ This is the frontend for the Personal Library application, built with SvelteKit 
     ```
     The app will be available at `http://localhost:5173` (or the next available port).
 
-## 📜 Available Scripts
+## Available Scripts
 
 - `pnpm dev`: Starts the development server with hot-reloading.
 - `pnpm build`: Builds the app for production.
