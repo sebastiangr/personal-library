@@ -2,7 +2,7 @@
 
 This is the backend API for the Personal Library application -work in progress-. It's a Node.js server built with Express and TypeScript, responsible for managing users, books, authors, genres, publishers, and the book loaning system. It uses a PostgreSQL database via the Prisma ORM and secures endpoints using JWT for authentication.
 
-## ✨ Features
+## Features
 
 - Secure user registration and login.
 - JWT-based authentication for protected routes.
@@ -15,7 +15,7 @@ This is the backend API for the Personal Library application -work in progress-.
 - Request data validation using Zod schemas.
 - Comprehensive test suite using Jest and Supertest.
 
-## 🛠️ Technologies Used
+##  Technologies Used
 
 - **Backend**: Node.js, Express.js
 - **Language**: TypeScript
@@ -26,7 +26,7 @@ This is the backend API for the Personal Library application -work in progress-.
 - **Testing**: Jest, Supertest
 - **Package Manager**: pnpm
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -76,7 +76,7 @@ This is the backend API for the Personal Library application -work in progress-.
     ```
     The server will start on `http://localhost:3003` (or the port you specified) with hot-reloading.
 
-## 🧪 Running Tests
+## Running Tests
 
 The project includes a full suite of integration tests. To run them, you'll first need a separate test database.
 
@@ -98,7 +98,7 @@ The project includes a full suite of integration tests. To run them, you'll firs
     pnpm test
     ```
 
-## 📜 Available Scripts
+## Available Scripts
 
 - `pnpm dev`: Starts the server in development mode with hot-reloading using `nodemon`.
 - `pnpm build`: Generates the Prisma client and compiles the TypeScript code to JavaScript in the `dist/` directory.
@@ -108,7 +108,7 @@ The project includes a full suite of integration tests. To run them, you'll firs
 - `pnpm prisma:test:push`: Pushes the Prisma schema to the test database (useful for quick setup).
 - `pnpm prisma:test:reset`: Resets the test database.
 
-## 🔌 API Endpoints
+## API Endpoints
 
 All endpoints are prefixed with `/api`. Routes under `/books`, `/authors`, `/genres`, `/publishers`, and `/loans` require a `Bearer` token in the `Authorization` header.
 
