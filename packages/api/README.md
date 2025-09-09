@@ -38,7 +38,7 @@ This is the backend API for the Personal Library application -work in progress-.
 
 1.  **Clone the repository** and navigate to the API package:
     ```bash
-    git clone <repository-url>
+    git clone https://github.com/sebastiangr/personal-library.git
     cd personal-library/packages/api
     ```
 
